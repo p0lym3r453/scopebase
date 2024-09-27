@@ -2,7 +2,7 @@ import mysql.connector
 from tabulate import tabulate
 import getpass
 
-__version__ = "0.3"
+__version__ = "0.3.1"
 
 def execute_query(cursor, query):
     cursor.execute(query)
@@ -10,13 +10,7 @@ def execute_query(cursor, query):
     columns = [i[0] for i in cursor.description]
     return result, columns
 
-def truncate_text(text, max_length=20):
-    """Truncate text to a maximum length, adding '...' if needed."""
-    return text if len(text) <= max_length else text[:max_length] + '...'
-
 def display_table(result, columns, query_name):
-    # Optional: Truncate long text if needed (20 characters in this case)
-    result = [[truncate_text(str(item), 20) for item in row] for row in result]
     print(f"\nResults for {query_name}:")
     print(tabulate(result, headers=columns, tablefmt="fancy_grid"))
 
@@ -56,12 +50,8 @@ def query_slides(cursor):
     return execute_query(cursor, query)
 
 def main():
-    print(f"Scopebase Query Application, Version {__version__}")
-
-    # Get the password from the user
-    password = getpass.getpass(prompt="Enter your MariaDB password: ")
-
-    # Connect to the MariaDB database
+    # Connect to the database
+    password = getpass.getpass("Enter the password for the database: ")
     connection = mysql.connector.connect(
         host="scopebase.fritz.box",
         user="sr",
@@ -71,23 +61,18 @@ def main():
 
     cursor = connection.cursor()
 
-    try:
-        # Run the first query (samples data) and display results
-        print("\nQuerying samples data...")
-        samples_result, samples_columns = query_samples(cursor)
-        display_table(samples_result, samples_columns, "Samples")
+    # Query and display sample data
+    sample_result, sample_columns = query_samples(cursor)
+    display_table(sample_result, sample_columns, "Sample Data")
 
-        # Run the second query (slides data) and display results
-        print("\nQuerying slides data...")
-        slides_result, slides_columns = query_slides(cursor)
-        display_table(slides_result, slides_columns, "Slides")
+    # Query and display slide data
+    slide_result, slide_columns = query_slides(cursor)
+    display_table(slide_result, slide_columns, "Slide Data")
 
-        input("\nPress Enter to exit...")
-
-    finally:
-        # Close the connection
-        cursor.close()
-        connection.close()
-
+    cursor.close()
+    connection.close()
+    
+    # Wait for user input to keep the terminal open
+    input("\nPress Enter to exit...")
 if __name__ == "__main__":
     main()
