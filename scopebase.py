@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 # Version string
-__version__ = "0.4"
+__version__ = "0.4.1"
 
 def fetch_data(password):
     # Fetch data from the database.
