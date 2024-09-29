@@ -6,7 +6,7 @@ from tkinter import ttk
 __version__ = "0.4"
 
 def fetch_data(password):
-    """Fetch data from the database."""
+    # Fetch data from the database.
     conn = mysql.connector.connect(
         host='scopebase.fritz.box',
         user='sr',
@@ -15,7 +15,7 @@ def fetch_data(password):
     )
     cursor = conn.cursor()
 
-    # Sample query
+    # Sample query.
     sample_query = (
         "SELECT `sample`.`id` `Sample-ID`, `sample`.`date` `Date`, "
         "`location`.`name` `Location`, `sample-type`.`name` `Type`, "
@@ -35,7 +35,7 @@ def fetch_data(password):
         "ORDER BY `Sample-ID` DESC"
     )
 
-    # Slide query
+    # Slide query.
     slide_query = (
         "SELECT `slide`.`id` `Slide-ID`, `sample`.`id` `Sample-ID`, "
         "`sample-type`.`name` `Sample-Type`, `fixation`.`name` `Fixation`, "
@@ -61,14 +61,14 @@ def fetch_data(password):
         "ORDER BY `Slide-ID` DESC"
     )
 
-    # Execute queries
+    # Execute queries.
     cursor.execute(sample_query)
     samples = cursor.fetchall()
 
     cursor.execute(slide_query)
     slides = cursor.fetchall()
 
-    # Close the connection
+    # Close the connection.
     cursor.close()
     conn.close()
 
@@ -82,17 +82,17 @@ def adjust_column_width(tree, data):
 
 def display_data(samples, slides):
     """Display the fetched data in the treeview."""
-    # Clear previous data
+    # Clear previous data.
     for item in sample_tree.get_children():
         sample_tree.delete(item)
     for item in slide_tree.get_children():
         slide_tree.delete(item)
 
-    # Insert sample data into the treeview
+    # Insert sample data into the treeview.
     for sample in samples:
         sample_tree.insert('', 'end', values=sample)
 
-    # Insert slide data into the treeview
+    # Insert slide data into the treeview.
     for slide in slides:
         slide_tree.insert('', 'end', values=slide)
 
@@ -100,10 +100,12 @@ def display_data(samples, slides):
     adjust_column_width(sample_tree, samples)
     adjust_column_width(slide_tree, slides)
 
-    # Hide password entry, button, and prompt label
+    # Hide password entry, button, and prompt label.
     password_entry.pack_forget()
     fetch_button.pack_forget()
-    prompt_label.pack_forget()  # Hide the prompt label
+
+    # Hide the prompt label.
+    prompt_label.pack_forget()
 
 def on_fetch_data():
     """Fetch data and display it when button is clicked."""
@@ -111,64 +113,66 @@ def on_fetch_data():
     samples, slides = fetch_data(password)
     display_data(samples, slides)
 
-# Create the main application window
+# Create the main application window.
 root = tk.Tk()
 root.title("ScopeBase Database Viewer")
 
-# Start the application maximized
+# Start the application maximized.
 root.state('zoomed')
 
-# Initially display password entry
+# Initially display password entry.
 prompt_label = tk.Label(root, text="Enter Database Password:")
 prompt_label.pack(pady=5)
 
 password_entry = tk.Entry(root, show="*")
 password_entry.pack(pady=5)
 
-# Fetch button
+# Fetch button.
 fetch_button = tk.Button(root, text="Fetch Data", command=on_fetch_data)
 fetch_button.pack(pady=5)
 
-# Create a notebook (tabbed interface)
+# Create a notebook (tabbed interface).
 notebook = ttk.Notebook(root)
 notebook.pack(pady=10, fill=tk.BOTH, expand=True)
 
-# Frame for sample data
+# Frame for sample data.
 sample_frame = ttk.Frame(notebook)
 notebook.add(sample_frame, text="Sample Data")
 
-# Frame for slide data
+# Frame for slide data.
 slide_frame = ttk.Frame(notebook)
 notebook.add(slide_frame, text="Slide Data")
 
-# Sample table
+# Sample table.
 sample_tree = ttk.Treeview(sample_frame, columns=(
     "Sample-ID", "Date", "Location", "Type", "Fixation", 
     "Preservative", "Latitude", "Longitude", "T", "pH", 
     "EC", "NO3", "Note"), show="headings")
 
-# Define column headings and align left
+# Define column headings and align left.
 for col in sample_tree["columns"]:
     sample_tree.heading(col, text=col)
-    sample_tree.column(col, anchor="w")  # Left alignment
+    # Left alignment.
+    sample_tree.column(col, anchor="w")
 
-# Pack the Treeview to fill the frame
+# Pack the Treeview to fill the frame.
 sample_tree.pack(fill=tk.BOTH, expand=True)
 
-# Slide table
+# Slide table.
 slide_tree = ttk.Treeview(slide_frame, columns=(
     "Slide-ID", "Sample-ID", "Sample-Type", "Fixation", 
     "Preservative", "Protocol", "Mounting-Medium", 
     "Slide-Date", "Sample-Date", "Location", 
     "Sample-Latitude", "Sample-Longitude"), show="headings")
 
-# Define column headings and align left
+# Define column headings and align left.
 for col in slide_tree["columns"]:
     slide_tree.heading(col, text=col)
-    slide_tree.column(col, anchor="w")  # Left alignment
+    # Left alignment.
+    slide_tree.column(col, anchor="w")
 
-# Pack the Treeview to fill the frame
+# Pack the Treeview to fill the frame.
 slide_tree.pack(fill=tk.BOTH, expand=True)
 
-# Start the application
+# Start the application.
 root.mainloop()
